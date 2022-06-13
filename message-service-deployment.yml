@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: message-service
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      run: message-service
+  template:
+    metadata:
+      labels:
+        run: message-service
+    spec:
+      containers:
+        - name: nextpos-message-service
+          image: docker.io/joelin/nextpos-message-service:latest
+          imagePullPolicy: Always
+
+          ports:
+            - containerPort: 8082
+              protocol: TCP

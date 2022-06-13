@@ -1,0 +1,10 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: message-ingress
+spec:
+  defaultBackend:
+    service:
+      name: message-service
+      port:
+        number: 8082

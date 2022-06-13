@@ -13,6 +13,10 @@ workflows:
           context:
             - "GitHub Release Credentials"
             - "Docker"
+      - deploy:
+          requires:
+            - build
+          context: "Docker"
 
 jobs:
   build:
@@ -36,7 +40,7 @@ jobs:
 
     steps:
       - setup_remote_docker:
-          version: 19.03.13
+          version: 20.10.14
 
       - checkout
       # Download and cache dependencies
@@ -70,20 +74,19 @@ jobs:
           command: |
             docker push joelin/nextpos-message-service:latest
 
-#  docker:
-#    machine: true
-#    steps:
-#      - attach_workspace:
-#          at: .
-#      - run:
-#          name: build docker image
-#          command: |
-#            ./gradlew bootBuildImage -PciBuild
-#      - run:
-#          name: docker login
-#          command: |
-#            echo $DOCKER_PASSWORD | docker login -u "$DOCKER_USERNAME" --password-stdin
-#      - run:
-#          name: push docker image
-#          command: |
-#            docker push joelin/einvoice-service:latest
+  deploy:
+    docker:
+      - image: google/cloud-sdk:389.0.0-alpine
+    steps:
+      - run:
+          name: deploy to gcp
+          command: |
+            gcloud components install kubectl --quiet
+            gcloud config set project helpful-range-236813
+            echo $GOOGLE_SERVICE_ACCOUNT_JSON | base64 -d > service_account.json
+            gcloud auth activate-service-account travis-ci-user@helpful-range-236813.iam.gserviceaccount.com --key-file=service_account.json
+            gcloud config set compute/zone asia-east1-b
+            gcloud container clusters get-credentials messaging-cluster --region asia-east1 --project helpful-range-236813
+            kubectl get deployment message-service
+            kubectl set image deployment/message-service message-service=docker.io/joelin/message-service
+            kubectl get services message-service
