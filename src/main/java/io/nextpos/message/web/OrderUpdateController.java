@@ -21,10 +21,12 @@ public class OrderUpdateController {
     }
 
     @PostMapping("/inflightOrders/{clientId}")
-    public void handleInflightOrdersUpdate(@PathVariable String clientId) {
+    public String handleInflightOrdersUpdate(@PathVariable String clientId) {
 
         LOGGER.info("Sending inflight order update message for client {}", clientId);
 
         messagingTemplate.convertAndSend("/topic/inflightOrders/" + clientId, clientId + ".inflightOrders.ordersChanged");
+
+        return clientId;
     }
 }
