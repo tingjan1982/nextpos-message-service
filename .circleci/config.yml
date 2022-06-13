@@ -88,5 +88,5 @@ jobs:
             gcloud config set compute/zone asia-east1-b
             gcloud container clusters get-credentials messaging-cluster --region asia-east1 --project helpful-range-236813
             kubectl get deployment message-service
-            kubectl set image deployment/message-service message-service=docker.io/joelin/message-service
+            kubectl set image deployment/message-service nextpos-message-service=docker.io/joelin/nextpos-message-service
             kubectl get services message-service
