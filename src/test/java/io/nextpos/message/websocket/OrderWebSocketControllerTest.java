@@ -36,7 +36,7 @@ class OrderWebSocketControllerTest {
     }
 
     @Test
-    void test() throws Exception {
+    void testInflightOrdersUpdate() throws Exception {
         WebSocketStompClient stompClient = new WebSocketStompClient(new SockJsClient(createTransportClient()));
         stompClient.setMessageConverter(new StringMessageConverter());
 
@@ -58,6 +58,35 @@ class OrderWebSocketControllerTest {
         });
 
         stompSession.send("/async/inflightOrders/testClient", null);
+
+        String receivedUpdate = completableFuture.get(3, SECONDS);
+
+        assertThat(receivedUpdate).isNotEmpty();
+    }
+
+    @Test
+    void testOrderUpdate() throws Exception {
+        WebSocketStompClient stompClient = new WebSocketStompClient(new SockJsClient(createTransportClient()));
+        stompClient.setMessageConverter(new StringMessageConverter());
+
+        StompSession stompSession = stompClient.connect(url, new StompSessionHandlerAdapter() {
+        }).get(1, SECONDS);
+
+        CompletableFuture<String> completableFuture = new CompletableFuture<>();
+
+        stompSession.subscribe("/topic/order/1001", new StompFrameHandler() {
+            @Override
+            public Type getPayloadType(StompHeaders headers) {
+                return String.class;
+            }
+
+            @Override
+            public void handleFrame(StompHeaders headers, Object payload) {
+                completableFuture.complete("handled " + payload);
+            }
+        });
+
+        stompSession.send("/async/order/1001", null);
 
         String receivedUpdate = completableFuture.get(3, SECONDS);
 

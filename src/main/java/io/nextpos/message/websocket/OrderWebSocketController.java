@@ -23,7 +23,7 @@ public class OrderWebSocketController {
     @MessageMapping("/inflightOrders/{clientId}")
     @SendTo("/topic/inflightOrders/{clientId}")
     public String inflightOrders(@DestinationVariable String clientId) {
-        LOGGER.info("Received inflight order message subscribe request for client id: {}", clientId);
+        LOGGER.info("Received inflight orders message subscribe request for client id: {}", clientId);
 
         return clientId + ".inflightOrders.established";
     }
@@ -31,6 +31,7 @@ public class OrderWebSocketController {
     @MessageMapping("/order/{orderId}")
     @SendTo("/topic/order/{orderId}")
     public String orderDetails(@DestinationVariable String orderId) {
+        LOGGER.info("Received order message subscribe request for order id: {}", orderId);
 
         return orderId + ".order.established";
     }

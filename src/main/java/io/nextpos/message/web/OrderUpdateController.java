@@ -23,10 +23,20 @@ public class OrderUpdateController {
     @PostMapping("/inflightOrders/{clientId}")
     public String handleInflightOrdersUpdate(@PathVariable String clientId) {
 
-        LOGGER.info("Sending inflight order update message for client {}", clientId);
+        LOGGER.info("Sending inflight orders update message for client {}", clientId);
 
         messagingTemplate.convertAndSend("/topic/inflightOrders/" + clientId, clientId + ".inflightOrders.ordersChanged");
 
         return clientId;
+    }
+
+    @PostMapping("/orders/{orderId}")
+    public String handleOrderUpdate(@PathVariable String orderId) {
+
+        LOGGER.info("Sending order update message for order {}", orderId);
+
+        messagingTemplate.convertAndSend("/topic/order/" + orderId, orderId + ".order.orderChanged");
+
+        return orderId;
     }
 }
